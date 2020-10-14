@@ -21,6 +21,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -35,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String CurrentUserID;
     private FirebaseAuth mAuth;
     private DatabaseReference ref;
+    private StorageReference profileImageRef;
     private static final int galleryPic = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         mAuth= FirebaseAuth.getInstance();
         CurrentUserID = mAuth.getCurrentUser().getUid();
         ref = FirebaseDatabase.getInstance().getReference();
+        profileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
         saveButton.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
@@ -148,6 +153,23 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode ==RESULT_OK){
+                Uri uri = result.getUri();
+
+                StorageReference filePath  = profileImageRef.child(CurrentUserID + ".jpg");
+                filePath.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(SettingsActivity.this, "Profile Picture updated successfully", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            String message = task.getException().getMessage().toString();
+                            Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
         }
     }
 
