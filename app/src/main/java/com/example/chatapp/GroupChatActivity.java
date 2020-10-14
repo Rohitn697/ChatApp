@@ -52,6 +52,7 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 saveMessagesToDB();
                 type.setText("");
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -64,6 +65,7 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()){
                     displayMessage(dataSnapshot);
+
                 }
             }
 
@@ -71,6 +73,7 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 if (dataSnapshot.exists()){
                     displayMessage(dataSnapshot);
+
                 }
             }
 
@@ -100,7 +103,14 @@ public class GroupChatActivity extends AppCompatActivity {
             String messageName = (String) ((DataSnapshot)iterator.next()).getValue();
             String messageTime = (String) ((DataSnapshot)iterator.next()).getValue();
             messages.append(messageName + ":\n" + currentMessage + "\n" + messageTime + "   " + messageDate+ "\n\n\n");
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            });
         }
+
     }
 
 
