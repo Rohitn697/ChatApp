@@ -107,12 +107,17 @@ public class MainActivity extends AppCompatActivity {
            settingActivity();
        }
        if (item.getItemId()==R.id.user_friends){
-
+        findFriends();
        }
         if (item.getItemId()==R.id.user_groups){
             createGroup();
         }
        return true;
+    }
+
+    private void findFriends() {
+        Intent intent = new Intent(MainActivity.this,FindFriendsActivity.class);
+        startActivity(intent);
     }
 
     private void createGroup() {
