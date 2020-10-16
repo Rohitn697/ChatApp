@@ -95,7 +95,6 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 else {
                     //update userdata
-                    Toast.makeText(SettingsActivity.this, "Invalid Input", Toast.LENGTH_SHORT).show();
                 }
             }
 
