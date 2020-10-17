@@ -150,6 +150,9 @@ public class profileActivity extends AppCompatActivity {
                     if (currentState.equals("request_received")){
                         acceptRequest();
                     }
+                    if (currentState.equals("friends")){
+                        removeContact();
+                    }
                 }
             });
 
@@ -157,6 +160,26 @@ public class profileActivity extends AppCompatActivity {
         else {
             sendRequest.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void removeContact() {
+        contactsRef.child(currentUserID).child(receiverUserID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                contactsRef.child(receiverUserID).child(currentUserID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        currentState = "new";
+                        sendRequest.setText("Send Message Request");
+                        sendRequest.setEnabled(true);
+                    }
+                    }
+                });
+                }
+            }
+        });
     }
 
     private void acceptRequest() {
