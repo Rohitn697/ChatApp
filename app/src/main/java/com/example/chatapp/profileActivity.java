@@ -25,7 +25,7 @@ public class profileActivity extends AppCompatActivity {
     private String receiverUserID,currentState,currentUserID,receiverName;
     private CircleImageView visitorProfilePic;
     private TextView username,status;
-    private Button sendRequest;
+    private Button sendRequest,cancelRequest;
     private DatabaseReference ref,chatReqRef;
     FirebaseAuth mAuth;
     @Override
@@ -46,6 +46,7 @@ public class profileActivity extends AppCompatActivity {
         username = (TextView) findViewById(R.id.visited_username);
         status = (TextView) findViewById(R.id.visited_status);
         sendRequest = (Button) findViewById(R.id.sendRequest);
+        cancelRequest = (Button) findViewById(R.id.cancelRequest);
         currentState = "new";
     }
     private void retrieveInfo() {
@@ -92,6 +93,21 @@ public class profileActivity extends AppCompatActivity {
                      currentState="request_sent";
                      sendRequest.setText("Cancel Message Request");
                  }
+                 //on receivers end
+                else if (request_type.equals("received")){
+                     currentState = "request_received";
+                     sendRequest.setText("Accept Request");
+                     cancelRequest.setVisibility(View.VISIBLE);
+                     cancelRequest.setEnabled(true);
+                     cancelRequest.setOnClickListener(new View.OnClickListener() {
+                         @Override
+                         public void onClick(View view) {
+                             cancelChatrequest();
+                             cancelRequest.setVisibility(View.INVISIBLE);
+                             cancelRequest.setEnabled(false);
+                         }
+                     });
+                 }
             }
             }
 
@@ -110,12 +126,37 @@ public class profileActivity extends AppCompatActivity {
                         Toast.makeText(profileActivity.this, "Message request has been sent to "+ receiverName , Toast.LENGTH_SHORT).show();
                         sendChatRequest();
                     }
+                    if (currentState.equals("request_sent")){
+                        cancelChatrequest();
+                        Toast.makeText(profileActivity.this, "Request Withdrawn", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
+
         }
         else {
             sendRequest.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void cancelChatrequest() {
+        chatReqRef.child(currentUserID).child(receiverUserID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+           if (task.isSuccessful()){
+               chatReqRef.child(receiverUserID).child(currentUserID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                   @Override
+                   public void onComplete(@NonNull Task<Void> task) {
+                       if (task.isSuccessful()){
+                           sendRequest.setEnabled(true);
+                           currentState="new";
+                           sendRequest.setText("Send Message Request");
+                       }
+                   }
+               });
+           }
+            }
+        });
     }
 
     private void sendChatRequest() {

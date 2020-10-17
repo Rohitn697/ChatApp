@@ -55,4 +55,17 @@
         android:text="Send Message Request"
         android:textAllCaps="false"
         />
+    <Button
+        android:id="@+id/cancelRequest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sendRequest"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="65dp"
+        android:layout_marginRight="65dp"
+        android:background="@drawable/buttons"
+        android:text="Cancel Request"
+        android:textAllCaps="false"
+        android:visibility="invisible"
+        />
 </RelativeLayout>
