@@ -38,7 +38,7 @@
         android:text="Hey there! WhatsUp is using me"
         android:textStyle="bold"
         android:textAlignment="center"
-        android:textSize="25sp"
+        android:textSize="22sp"
         android:layout_marginTop="25dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
