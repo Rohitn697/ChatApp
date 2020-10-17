@@ -52,7 +52,7 @@
         android:layout_marginLeft="65dp"
         android:layout_marginRight="65dp"
         android:background="@drawable/buttons"
-        android:text="Send Message"
+        android:text="Send Message Request"
         android:textAllCaps="false"
         />
 </RelativeLayout>
