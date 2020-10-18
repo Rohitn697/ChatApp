@@ -3,6 +3,7 @@ package com.example.chatapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -45,6 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int galleryPic = 1;
     private ProgressDialog loadingBar;
     private String photoUrl;
+
+    private androidx.appcompat.widget.Toolbar settings_toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +115,12 @@ public class SettingsActivity extends AppCompatActivity {
         status = (EditText) findViewById(R.id.set_about);
         profilePic = (CircleImageView) findViewById(R.id.profile_image);
         loadingBar = new ProgressDialog(this);
+        settings_toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
+        setSupportActionBar(settings_toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setTitle("Settings");
+
     }
 
     private void saveSettings() {
@@ -125,12 +134,12 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, "Try updating your status", Toast.LENGTH_SHORT).show();
     }
     else {
-      HashMap<String,String> profileMap = new HashMap<>();
+      HashMap<String,Object> profileMap = new HashMap<>();
           profileMap.put("uid",CurrentUserID);
           profileMap.put("name",username);
           profileMap.put("status",about);
           profileMap.put("image",photoUrl);
-        ref.child("Users").child(CurrentUserID).setValue(profileMap).
+        ref.child("Users").child(CurrentUserID).updateChildren(profileMap).
                 addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
