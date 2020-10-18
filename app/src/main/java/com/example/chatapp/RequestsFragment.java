@@ -1,5 +1,7 @@
 package com.example.chatapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,9 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -73,7 +78,7 @@ public class RequestsFragment extends Fragment {
     }
     private View requestFragmentView;
     private RecyclerView recyclerView;
-    private DatabaseReference chatReqRef,UserRef;
+    private DatabaseReference chatReqRef,UserRef,contactsRef;
     private FirebaseAuth mAuth;
     private String CurrentUserID;
     @Override
@@ -84,6 +89,7 @@ public class RequestsFragment extends Fragment {
         recyclerView = (RecyclerView) requestFragmentView.findViewById(R.id.requestsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chatReqRef = FirebaseDatabase.getInstance().getReference().child("Chat Request");
+        contactsRef = FirebaseDatabase.getInstance().getReference().child("contacts");
         mAuth = FirebaseAuth.getInstance();
         CurrentUserID = mAuth.getCurrentUser().getUid();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -100,7 +106,7 @@ public class RequestsFragment extends Fragment {
                 holder.itemView.findViewById(R.id.acceptButton).setVisibility(View.VISIBLE);
                 holder.itemView.findViewById(R.id.rejectButton).setVisibility(View.VISIBLE);
                 final String userId_list = getRef(position).getKey();
-                DatabaseReference requestRef = getRef(position).child("request_type").getRef();
+                final DatabaseReference requestRef = getRef(position).child("request_type").getRef();
                 requestRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -111,21 +117,74 @@ public class RequestsFragment extends Fragment {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         if (snapshot.hasChild("image")){
-                                            String profileName = snapshot.child("name").getValue().toString();
-                                            String profileStatus = snapshot.child("status").getValue().toString();
                                             String profilePhoto = snapshot.child("image").getValue().toString();
 
-                                            holder.username.setText(profileName);
-                                            holder.userStatus.setText(profileStatus);
                                             Picasso.get().load(profilePhoto).into(holder.userPic);
                                         }
-                                        else{
-                                            String profileName = snapshot.child("name").getValue().toString();
+
+                                            final String profileName = snapshot.child("name").getValue().toString();
                                             String profileStatus = snapshot.child("status").getValue().toString();
 
                                             holder.username.setText(profileName);
-                                            holder.userStatus.setText(profileStatus);
-                                        }
+                                            holder.userStatus.setText("Wants to connect with you");
+
+                                        holder.itemView.findViewById(R.id.acceptButton).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                //accept request
+                                                contactsRef.child(CurrentUserID).child(userId_list).child("contacts").setValue("saved")
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()){
+                                                                    contactsRef.child(userId_list).child(CurrentUserID).child("contacts").setValue("saved")
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    if (task.isSuccessful()){
+                                                                                        chatReqRef.child(CurrentUserID).child(userId_list).removeValue()
+                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                        if (task.isSuccessful()){
+                                                                                                            chatReqRef.child(userId_list).child(CurrentUserID)
+                                                                                                                    .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                @Override
+                                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                                    Toast.makeText(getContext(), "Successfully Added "+ profileName + " to your Contacts", Toast.LENGTH_SHORT).show();
+                                                                                                                }
+                                                                                                            });
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        });
+                                        holder.itemView.findViewById(R.id.rejectButton).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                chatReqRef.child(CurrentUserID).child(userId_list).removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()){
+                                                                    chatReqRef.child(userId_list).child(CurrentUserID)
+                                                                            .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            Toast.makeText(getContext(), "Request Declined", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        });
                                     }
 
                                     @Override
@@ -138,7 +197,7 @@ public class RequestsFragment extends Fragment {
                                Button requestSent = holder.itemView.findViewById(R.id.acceptButton);
                                requestSent.setText("Request Sent");
 
-                               holder.itemView.findViewById(R.id.rejectButton).setVisibility(View.INVISIBLE);
+                                holder.itemView.findViewById(R.id.rejectButton).setVisibility(View.INVISIBLE);
                                 UserRef.child(userId_list).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
