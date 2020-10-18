@@ -51,29 +51,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:background="@android:color/holo_green_light"
-                android:text="Accept"
-                android:textSize="16sp"
-                android:textAllCaps="false"
-                android:textColor="@color/cardview_light_background"
-                android:visibility="invisible"
-                >
-            </Button>
+
                 <Button
+                    android:id="@+id/acceptButton"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:background="@android:color/holo_red_light"
-                    android:text="Reject"
-                    android:layout_marginStart="15dp"
-                    android:textSize="16sp"
+                    android:background="@android:color/holo_green_light"
+                    android:text="Accept"
                     android:textAllCaps="false"
                     android:textColor="@color/cardview_light_background"
-                    android:visibility="invisible"
-                    >
-                </Button>
+                    android:textSize="16sp"
+                    android:visibility="invisible"></Button>
+
+                <Button
+                    android:id="@+id/rejectButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="15dp"
+                    android:background="@android:color/holo_red_light"
+                    android:text="Reject"
+                    android:textAllCaps="false"
+                    android:textColor="@color/cardview_light_background"
+                    android:textSize="16sp"
+                    android:visibility="invisible"></Button>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
