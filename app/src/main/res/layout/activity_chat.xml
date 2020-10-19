@@ -33,7 +33,7 @@
             />
 
         <Button
-            android:id="@+id/senddm_button"
+            android:id="@+id/sendDm_button"
             android:layout_width="52dp"
             android:layout_height="50dp"
             android:background="@drawable/send"
