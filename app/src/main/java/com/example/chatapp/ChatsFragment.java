@@ -76,6 +76,7 @@ public class ChatsFragment extends Fragment {
     private DatabaseReference chatsRef,usersRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,13 +103,14 @@ public class ChatsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull final chatsViewHolder holder, int position, @NonNull contacts model) {
             final String usersIDs = getRef(position).getKey();
+                final String[] profilePhoto = {"default"};
             usersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                if (snapshot.exists()){
                    if (snapshot.hasChild("image")){
-                       String profilePhoto = snapshot.child("image").getValue().toString();
-                       Picasso.get().load(profilePhoto).into(holder.profilePic);
+                       profilePhoto[0] = snapshot.child("image").getValue().toString();
+                       Picasso.get().load(profilePhoto[0]).into(holder.profilePic);
                    }
                    final String profileName = snapshot.child("name").getValue().toString();
                    String profileStatus = snapshot.child("status").getValue().toString();
@@ -123,6 +125,7 @@ public class ChatsFragment extends Fragment {
                            Intent intent = new Intent(getContext(),ChatActivity.class);
                            intent.putExtra("visited_userID",usersIDs);
                            intent.putExtra("username",profileName);
+                           intent.putExtra("image", profilePhoto[0]);
                            startActivity(intent);
                        }
                    });
