@@ -1,12 +1,29 @@
 package com.example.chatapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,11 +71,96 @@ public class ChatsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    private View chatsView;
+    private RecyclerView chatsList;
+    private DatabaseReference chatsRef,usersRef;
+    private FirebaseAuth mAuth;
+    private String currentUserID;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chats, container, false);
+
+        chatsView =  inflater.inflate(R.layout.fragment_chats, container, false);
+        chatsList = (RecyclerView) chatsView.findViewById(R.id.chats);
+        chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAuth= FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        chatsRef= FirebaseDatabase.getInstance().getReference().child("contacts").child(currentUserID);
+        return chatsView;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseRecyclerOptions<contacts> options = new FirebaseRecyclerOptions.Builder<contacts>().
+                setQuery(chatsRef,contacts.class)
+                .build();
+
+        FirebaseRecyclerAdapter<contacts,chatsViewHolder> adapter = new FirebaseRecyclerAdapter<contacts, chatsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull final chatsViewHolder holder, int position, @NonNull contacts model) {
+            final String usersIDs = getRef(position).getKey();
+            usersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+               if (snapshot.exists()){
+                   if (snapshot.hasChild("image")){
+                       String profilePhoto = snapshot.child("image").getValue().toString();
+                       Picasso.get().load(profilePhoto).into(holder.profilePic);
+                   }
+                   final String profileName = snapshot.child("name").getValue().toString();
+                   String profileStatus = snapshot.child("status").getValue().toString();
+
+                   holder.userName.setText(profileName);
+                   holder.userStatus.setText("Last seen: ");
+
+                    // on click goto chat activity
+                   holder.itemView.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View view) {
+                           Intent intent = new Intent(getContext(),ChatActivity.class);
+                           intent.putExtra("visited_userID",usersIDs);
+                           intent.putExtra("username",profileName);
+                           startActivity(intent);
+                       }
+                   });
+               }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            }
+
+            @NonNull
+            @Override
+            public chatsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_display_layout,parent,false);
+                chatsViewHolder chatsViewHolder = new chatsViewHolder(view);
+                return chatsViewHolder;
+            }
+        };
+        chatsList.setAdapter(adapter);
+        adapter.startListening();
+
+    }
+
+
+    public static class chatsViewHolder extends RecyclerView.ViewHolder{
+        CircleImageView profilePic;
+        TextView userName,userStatus;
+        public chatsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            profilePic = itemView.findViewById(R.id.users_profile_pic);
+            userName = itemView.findViewById(R.id.user_profileName);
+            userStatus = itemView.findViewById(R.id.user_currentStatus);
+
+        }
+    }
+
 }
