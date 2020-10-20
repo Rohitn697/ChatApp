@@ -1,11 +1,15 @@
 package com.example.chatapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -18,11 +22,16 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -36,7 +45,11 @@ public class ChatActivity extends AppCompatActivity {
     androidx.appcompat.widget.Toolbar chatToolbar;
     private String currentSenderID;
     private FirebaseAuth mAuth;
-   private DatabaseReference rootRef;
+    private DatabaseReference rootRef;
+    private final List<Messages> messagesList = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
+    private MessageAdapter messageAdapter;
+    private RecyclerView userMessagesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,15 +95,95 @@ public class ChatActivity extends AppCompatActivity {
             sendMessage();
             }
         });
+
+        if (Build.VERSION.SDK_INT >= 11) {
+            userMessagesList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v,
+                                           int left, int top, int right, int bottom,
+                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    if (bottom < oldBottom) {
+                        userMessagesList.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                userMessagesList.smoothScrollToPosition(
+                                        userMessagesList.getAdapter().getItemCount() - 1);
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        }
     }
 
     private void intialise() {
         sendDm = (Button) findViewById(R.id.sendDm_button);
         message = (EditText) findViewById(R.id.send_dm);
+
+        messageAdapter  = new MessageAdapter(messagesList);
+        userMessagesList = (RecyclerView) findViewById(R.id.PmMessageList);
+        linearLayoutManager = new LinearLayoutManager(this);
+        userMessagesList.setLayoutManager(linearLayoutManager);
+        userMessagesList.setAdapter(messageAdapter);
     }
+
+
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        rootRef.child("Messages").child(currentSenderID).child(receiverID)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
+                        Messages messages = dataSnapshot.getValue(Messages.class);
+
+                        messagesList.add(messages);
+
+                        messageAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        messagesList.clear();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        messagesList.clear();
+    }
+
     private void sendMessage(){
         String messageText = message.getText().toString();
-        if(TextUtils.isEmpty(messageText)){
+        if(TextUtils.isEmpty(messageText) && TextUtils.equals("\n",messageText)){
             //don't send anything
         }
         else {
@@ -113,10 +206,10 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()){
-                    Toast.makeText(ChatActivity.this, "message sent!", Toast.LENGTH_SHORT).show();
+
                 }
                 else {
-                    Toast.makeText(ChatActivity.this, "error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "some error occured try again later!", Toast.LENGTH_SHORT).show();
                 }
                 message.setText("");
                 }
