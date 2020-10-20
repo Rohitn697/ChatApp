@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chatProfilePic"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/profile_image"
+        android:layout_marginTop="10dp"
+        >
+    </de.hdodenhof.circleimageview.CircleImageView>
+    <TextView
+        android:id="@+id/receiverTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@id/chatProfilePic"
+        android:background="@drawable/receiver_messages_layout"
+        android:text="hey sup boi?"
+        android:padding="10dp"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        >
+    </TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/senderTextView"
+        android:background="@drawable/sender_messages_layout"
+        android:padding="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="@+id/receiverTextView"
+        android:text="I am doing great thanks for asking"
+        android:textSize="14sp"
+        android:textStyle="bold">
+    </TextView>
+
+</RelativeLayout>
