@@ -186,7 +186,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage(){
         String messageText = message.getText().toString();
-        if(TextUtils.isEmpty(messageText) && TextUtils.equals("\n",messageText)){
+        if(TextUtils.isEmpty(messageText)){
             //don't send anything
         }
         else {
