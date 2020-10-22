@@ -250,7 +250,7 @@ public class profileActivity extends AppCompatActivity {
                            chatNotif.put("from",currentUserID);
                            chatNotif.put("type","request");
 
-                           notifRef.child(currentUserID).push().setValue(chatNotif).addOnCompleteListener(new OnCompleteListener<Void>() {
+                           notifRef.child(receiverUserID).push().setValue(chatNotif).addOnCompleteListener(new OnCompleteListener<Void>() {
                                @Override
                                public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
