@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
@@ -40,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView forgetPassword,signUp;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private DatabaseReference ref;
+    private DatabaseReference ref,userRef;
     //progress bar
     final LoadingDialog loadingDialog = new LoadingDialog(LoginActivity.this);
     @Override
@@ -56,8 +57,9 @@ public class LoginActivity extends AppCompatActivity {
         //firebase setup
         mAuth=FirebaseAuth.getInstance();
         currentUser=mAuth.getCurrentUser();
-        ref = FirebaseDatabase.getInstance().getReference();
 
+        ref = FirebaseDatabase.getInstance().getReference();
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         //onclick functions
         //for normal email login
@@ -164,9 +166,18 @@ public class LoginActivity extends AppCompatActivity {
                             String CurrentUserId = mAuth.getCurrentUser().getUid();
                             ref.child("Users").child(CurrentUserId);
                             FirebaseUser currentUser = mAuth.getCurrentUser();
-                            startMainActivity();
-                            loadingDialog.dismissDialog();
-                            Toast.makeText(LoginActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
+                            String DeviceId = FirebaseInstanceId.getInstance().getToken();
+                            String userID = mAuth.getCurrentUser().getUid();
+                            userRef.child(userID).child("device_token").setValue(DeviceId).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        startMainActivity();
+                                        Toast.makeText(LoginActivity.this, "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                                        loadingDialog.dismissDialog();
+                                    }
+                                }
+                            });
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Authentication Failed!", Toast.LENGTH_SHORT).show();
@@ -192,9 +203,21 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
-                    startMainActivity();
-                        Toast.makeText(LoginActivity.this, "Logged In Successfully!", Toast.LENGTH_SHORT).show();
-                        loadingDialog.dismissDialog();
+                        String DeviceId = FirebaseInstanceId.getInstance().getToken();
+                        String userID = mAuth.getCurrentUser().getUid();
+                        userRef.child(userID).child("device_token").setValue(DeviceId).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                           if (task.isSuccessful()){
+                               startMainActivity();
+                               Toast.makeText(LoginActivity.this, "Logged In Successfully!", Toast.LENGTH_SHORT).show();
+                               loadingDialog.dismissDialog();
+                           }
+                            }
+                        });
+
+
+
                     }
                     else {
                         String message = task.getException().getMessage().toString();

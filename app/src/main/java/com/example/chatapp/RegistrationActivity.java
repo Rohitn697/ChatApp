@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class RegistrationActivity extends AppCompatActivity {
     Button register;
@@ -28,7 +29,7 @@ public class RegistrationActivity extends AppCompatActivity {
     TextView accountExist;
     private FirebaseUser currentuser;
     private FirebaseAuth mAuth;
-    private DatabaseReference ref;
+    private DatabaseReference ref,userRef;
     LoadingDialog loadingDialog = new LoadingDialog(RegistrationActivity.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class RegistrationActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
        currentuser= mAuth.getCurrentUser();
        ref = FirebaseDatabase.getInstance().getReference();
+       userRef = FirebaseDatabase.getInstance().getReference().child("Users");
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,13 +72,16 @@ public class RegistrationActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
-                        {   String CurrentUserId = mAuth.getCurrentUser().getUid();
+                           String deviceId = FirebaseInstanceId.getInstance().getToken();
+                           String CurrentUserId = mAuth.getCurrentUser().getUid();
                             ref.child("Users").child(CurrentUserId).setValue("");
+
+                            ref.child("Users").child(CurrentUserId).child("device_token").setValue(deviceId);
                             mainActivity();
                             Toast.makeText(RegistrationActivity.this, "Account Created Successfully!", Toast.LENGTH_SHORT).show();
                             loadingDialog.dismissDialog();
 
-                        }
+
                     }
                     else {
                         String message = task.getException().getMessage().toString();

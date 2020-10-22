@@ -19,6 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class profileActivity extends AppCompatActivity {
@@ -26,7 +28,7 @@ public class profileActivity extends AppCompatActivity {
     private CircleImageView visitorProfilePic;
     private TextView username,status;
     private Button sendRequest,cancelRequest;
-    private DatabaseReference ref,chatReqRef,contactsRef;
+    private DatabaseReference ref,chatReqRef,contactsRef,notifRef;
     FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class profileActivity extends AppCompatActivity {
         ref = FirebaseDatabase.getInstance().getReference().child("Users");
         chatReqRef=FirebaseDatabase.getInstance().getReference().child("Chat Request");
         contactsRef=FirebaseDatabase.getInstance().getReference().child("contacts");
+        notifRef = FirebaseDatabase.getInstance().getReference().child("Notification");
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         initialise();
@@ -242,9 +245,23 @@ public class profileActivity extends AppCompatActivity {
                 chatReqRef.child(receiverUserID).child(currentUserID).child("request_type").setValue("received").addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        sendRequest.setEnabled(true);
-                        currentState="request_sent";
-                        sendRequest.setText("Cancel Message Request");
+                       if(task.isSuccessful()) {
+                           HashMap<String,String> chatNotif = new HashMap<>();
+                           chatNotif.put("from",currentUserID);
+                           chatNotif.put("type","request");
+
+                           notifRef.child(currentUserID).push().setValue(chatNotif).addOnCompleteListener(new OnCompleteListener<Void>() {
+                               @Override
+                               public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                sendRequest.setEnabled(true);
+                                currentState = "request_sent";
+                                sendRequest.setText("Cancel Message Request");
+                            }
+                               }
+                           });
+
+                       }
                     }
                 });
             }
