@@ -107,7 +107,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 userMessagesList.smoothScrollToPosition(
-                                        userMessagesList.getAdapter().getItemCount() - 1);
+                                        userMessagesList.getAdapter().getItemCount());
                             }
                         }, 100);
                     }
