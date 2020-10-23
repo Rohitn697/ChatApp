@@ -45,7 +45,7 @@ public class ChatActivity extends AppCompatActivity {
     androidx.appcompat.widget.Toolbar chatToolbar;
     private String currentSenderID;
     private FirebaseAuth mAuth;
-    private DatabaseReference rootRef;
+    private DatabaseReference rootRef,notifRef;
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
@@ -59,7 +59,7 @@ public class ChatActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentSenderID = mAuth.getCurrentUser().getUid();
         rootRef = FirebaseDatabase.getInstance().getReference();
-
+        notifRef = FirebaseDatabase.getInstance().getReference().child("Notification");
 
 
         chatToolbar = (Toolbar) findViewById(R.id.chat_toolbar);
@@ -209,7 +209,11 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()){
+                    HashMap<String,String> chatNotif = new HashMap<>();
+                    chatNotif.put("from",currentSenderID);
+                    chatNotif.put("type","chat");
 
+                    notifRef.child(receiverID).push().setValue(chatNotif);
                 }
                 else {
                     Toast.makeText(ChatActivity.this, "some error occured try again later!", Toast.LENGTH_SHORT).show();
