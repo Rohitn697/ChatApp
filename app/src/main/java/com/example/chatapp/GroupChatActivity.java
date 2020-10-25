@@ -33,7 +33,7 @@ import java.util.List;
 
 public class GroupChatActivity extends AppCompatActivity {
     private Toolbar mainTool;
-    private Button send;
+    private Button send,sendFiles;
     private EditText type;
     private TextView messages;
     private String currentGroupName,currentUserId,currentUserName,currentDate,currentTime;
@@ -116,6 +116,8 @@ public class GroupChatActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(currentGroupName);
         send = (Button) findViewById(R.id.sendGroupMessage_button);
         type = (EditText) findViewById(R.id.sendGroupMessage);
+        sendFiles = (Button) findViewById(R.id.sendFiles_button);
+
         groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList);
         recyclerView = (RecyclerView) findViewById(R.id.groupMessage_list);
         linearLayoutManager = new LinearLayoutManager(this);

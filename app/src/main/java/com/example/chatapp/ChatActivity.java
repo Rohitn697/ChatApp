@@ -30,7 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView username,lastSeen;
     private EditText message;
     private CircleImageView userPic;
-    private Button sendDm;
+    private Button sendDm,sendFiles;
     androidx.appcompat.widget.Toolbar chatToolbar;
     private String currentSenderID;
     private FirebaseAuth mAuth;
@@ -51,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
     private RecyclerView userMessagesList;
+    private  String saveCurrentTime,saveCurrentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,12 +151,22 @@ public class ChatActivity extends AppCompatActivity {
     private void intialise() {
         sendDm = (Button) findViewById(R.id.sendDm_button);
         message = (EditText) findViewById(R.id.send_dm);
+        sendFiles =(Button) findViewById(R.id.sendFiles_button);
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM,yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendar.getTime());
 
         messageAdapter  = new MessageAdapter(messagesList);
         userMessagesList = (RecyclerView) findViewById(R.id.PmMessageList);
         linearLayoutManager = new LinearLayoutManager(this);
         userMessagesList.setLayoutManager(linearLayoutManager);
         userMessagesList.setAdapter(messageAdapter);
+
+
     }
 
 
@@ -229,6 +242,10 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("message",messageText);
             messageTextBody.put("type","Text");
             messageTextBody.put("from",currentSenderID);
+            messageTextBody.put("to",receiverID);
+            messageTextBody.put("messageKey",messagePushID);
+            messageTextBody.put("date",saveCurrentDate);
+            messageTextBody.put("time",saveCurrentTime);
 
             Map messageBodyDetails  = new HashMap();
             messageBodyDetails.put(messageSenderRef + "/"+ messagePushID , messageTextBody);
