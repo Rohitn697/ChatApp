@@ -130,6 +130,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverMessageText.setText(messages.getMessage()+ "\n \n" + messages.getDate() +", at "+messages.getTime());
             }
         }
+        else if (fromMessageType.equals("image"))
+        {
+            if (fromUserID.equals(messageSenderId)){
+                messageViewHolder.senderImageView.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.senderImageView);
+            }
+            else {
+                messageViewHolder.receiverImageView.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.receiverImageView);
+            }
+        }
     }
 
     @Override
