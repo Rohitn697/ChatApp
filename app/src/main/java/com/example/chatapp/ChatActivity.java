@@ -168,7 +168,7 @@ public class ChatActivity extends AppCompatActivity {
                         checker = "docx";
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_GET_CONTENT);
-                            intent.setType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                            intent.setType("application/msword");
                             startActivityForResult(Intent.createChooser(intent, "Select MS Word File"), 438);
                         }
                     }
@@ -295,7 +295,7 @@ public class ChatActivity extends AppCompatActivity {
                             messageImageBody.put("type",checker);
                             messageImageBody.put("from",currentSenderID);
                             messageImageBody.put("to", receiverID);
-                            messageImageBody.put("messageID", messagePushID);
+                            messageImageBody.put("messageKey", messagePushID);
                             messageImageBody.put("time", saveCurrentTime);
                             messageImageBody.put("date", saveCurrentDate);
 
