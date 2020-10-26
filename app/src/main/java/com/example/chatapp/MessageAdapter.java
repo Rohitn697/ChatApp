@@ -1,5 +1,7 @@
 package com.example.chatapp;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -40,7 +44,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     {
         public TextView senderMessageText, receiverMessageText;
         public CircleImageView receiverProfileImage;
-        public ImageView senderImageView,receiverImageView;
+        public ImageView senderImageView,receiverImageView,senderDocView,receiverDocView;
 
 
         public MessageViewHolder(@NonNull View itemView)
@@ -52,6 +56,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             receiverProfileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_image);
             senderImageView = (ImageView) itemView.findViewById(R.id.sender_image_view);
             receiverImageView = (ImageView) itemView.findViewById(R.id.receiver_image_view);
+            senderDocView = (ImageView) itemView.findViewById(R.id.sender_Doc_view);
+            receiverDocView = (ImageView) itemView.findViewById(R.id.receiver_Doc_view);
         }
     }
 
@@ -73,7 +79,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i)
+    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, final int i)
     {
         String messageSenderId = mAuth.getCurrentUser().getUid();
         Messages messages = userMessagesList.get(i);
@@ -110,6 +116,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.senderMessageText.setVisibility(View.GONE);
         messageViewHolder.receiverImageView.setVisibility(View.GONE);
         messageViewHolder.senderImageView.setVisibility(View.GONE);
+        messageViewHolder.receiverDocView.setVisibility(View.GONE);
+        messageViewHolder.senderDocView.setVisibility(View.GONE);
 
 
         if (fromMessageType.equals("Text"))
@@ -140,6 +148,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverImageView.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.receiverImageView);
+            }
+        }
+        else {
+            if (fromUserID.equals(messageSenderId)){
+                messageViewHolder.senderDocView.setVisibility(View.VISIBLE);
+
+                messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(i).getMessage()));
+                        messageViewHolder.itemView.getContext().startActivity(intent);
+
+                    }
+                });
+            }
+            else {
+                messageViewHolder.receiverDocView.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+
+                messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(userMessagesList.get(i).getMessage()));
+                        messageViewHolder.itemView.getContext().startActivity(intent);
+
+                    }
+                });
             }
         }
     }
