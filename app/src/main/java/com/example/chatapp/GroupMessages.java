@@ -1,28 +1,17 @@
 package com.example.chatapp;
 
 public class GroupMessages {
-    String date,message,name,time,userid;
+    String date,message,name,time,uid;
     public GroupMessages(){
 
     }
 
-    public GroupMessages(String uid) {
-        this.userid = uid;
-    }
-
-    public GroupMessages(String date, String message, String name, String time) {
+    public GroupMessages(String date, String message, String name, String time, String uid) {
         this.date = date;
         this.message = message;
         this.name = name;
         this.time = time;
-    }
-
-    public String getUserid() {
-        return userid;
-    }
-
-    public void setUserid(String uid) {
-        this.userid = uid;
+        this.uid = uid;
     }
 
     public String getDate() {
@@ -55,5 +44,13 @@ public class GroupMessages {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

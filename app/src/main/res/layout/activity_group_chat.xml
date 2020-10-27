@@ -11,9 +11,10 @@
         layout="@layout/app_layout_bar">
     </include>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/groupMessage_list"
+        android:id="@+id/groupRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/groupChat_linearLayout"
         android:layout_below="@+id/groupChat_bar"/>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,14 +25,7 @@
         android:background="#DCDCDC"
         android:orientation="horizontal"
         >
-        <Button
-            android:id="@+id/sendGroupFiles_button"
-            android:layout_margin="5dp"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:background="@drawable/sendattachment"
-            android:layout_alignParentStart="true"
-            />
+
         <EditText
             android:background="@drawable/roundborders"
             android:id="@+id/sendGroupMessage"

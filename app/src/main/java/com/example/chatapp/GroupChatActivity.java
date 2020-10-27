@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -61,6 +62,60 @@ public class GroupChatActivity extends AppCompatActivity {
                 type.setText("");
             }
         });
+        if (Build.VERSION.SDK_INT >= 11) {
+            recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v,
+                                           int left, int top, int right, int bottom,
+                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    if (bottom < oldBottom) {
+                        recyclerView.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerView.smoothScrollToPosition(
+                                        recyclerView.getAdapter().getItemCount());
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        }
+
+        groupRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
+                        GroupMessages groupMessages = dataSnapshot.getValue(GroupMessages.class);
+
+                        groupMessagesList.add(groupMessages);
+
+                        groupMessagesAdapter.notifyDataSetChanged();
+
+                        recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount());
+
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
     }
 
 
@@ -119,7 +174,7 @@ public class GroupChatActivity extends AppCompatActivity {
         sendFiles = (Button) findViewById(R.id.sendFiles_button);
 
         groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList);
-        recyclerView = (RecyclerView) findViewById(R.id.groupMessage_list);
+        recyclerView = (RecyclerView) findViewById(R.id.groupRecyclerView);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(groupMessagesAdapter);
