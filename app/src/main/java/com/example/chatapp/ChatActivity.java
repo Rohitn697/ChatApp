@@ -70,6 +70,7 @@ public class ChatActivity extends AppCompatActivity {
     private String checker = "",URL="";
     private StorageTask uploadTask;
     private Uri fileUri;
+    private  String UserID;
     private ProgressDialog loadingBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,6 +213,13 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateUserStatus("online");
+    }
+
     private void DisplayLastSeen(){
         rootRef.child("Users").child(receiverID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -437,6 +445,25 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+
+    }
+    private void updateUserStatus(String state){
+        String saveCurrentTime,saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM,yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String,Object> onlineStatus = new HashMap<>();
+        onlineStatus.put("time",saveCurrentTime);
+        onlineStatus.put("date",saveCurrentDate);
+        onlineStatus.put("state",state);
+
+        UserID = mAuth.getCurrentUser().getUid();
+        rootRef.child("Users").child(UserID).child("userState").updateChildren(onlineStatus);
 
     }
 }

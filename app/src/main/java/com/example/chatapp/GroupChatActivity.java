@@ -44,6 +44,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private GroupMessagesAdapter groupMessagesAdapter;
     private RecyclerView recyclerView;
+    String UserID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +118,10 @@ public class GroupChatActivity extends AppCompatActivity {
                 });
 
     }
+    protected void onStart() {
+        super.onStart();
+        updateUserStatus("online");
+    }
 
 
     private void saveMessagesToDB() {
@@ -178,6 +183,25 @@ public class GroupChatActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(groupMessagesAdapter);
+
+    }
+    private void updateUserStatus(String state){
+        String saveCurrentTime,saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM,yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String,Object> onlineStatus = new HashMap<>();
+        onlineStatus.put("time",saveCurrentTime);
+        onlineStatus.put("date",saveCurrentDate);
+        onlineStatus.put("state",state);
+
+        UserID = mAuth.getCurrentUser().getUid();
+        ref.child(UserID).child("userState").updateChildren(onlineStatus);
 
     }
 

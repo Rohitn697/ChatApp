@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         ref = FirebaseDatabase.getInstance().getReference();
 
+
     }
 
     @Override
@@ -74,12 +75,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         FirebaseUser currentuser=mAuth.getCurrentUser();
         if (currentuser!=null) {
-
+            updateUserStatus("offline");
         }
     }
 
