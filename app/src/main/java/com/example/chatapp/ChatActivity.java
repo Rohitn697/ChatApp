@@ -107,7 +107,7 @@ public class ChatActivity extends AppCompatActivity {
 
         intialise();
         username.setText(receiverName);
-        Picasso.get().load(receiverImage).into(userPic);
+        Picasso.get().load(receiverImage).placeholder(R.drawable.profile_image).into(userPic);
 
         sendDm.setOnClickListener(new View.OnClickListener() {
             @Override
