@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 
@@ -108,7 +109,7 @@ public class groupsFragment extends Fragment {
 
     private void initialiseFields() {
         listView = (ListView) groupFragmentView.findViewById(R.id.groupsList);
-        arrayAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,GroupsList);
+        arrayAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_expandable_list_item_1,GroupsList);
         listView.setAdapter(arrayAdapter);
     }
 
